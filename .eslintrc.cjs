@@ -14,6 +14,7 @@ module.exports = {
   settings: { react: { version: '18.2' } },
   plugins: ['react-refresh', 'react', 'react-hooks',],
   rules: {
+    // React
     'react-refresh/only-export-components': [
       'warn',
       { allowConstantExport: true },
@@ -23,7 +24,14 @@ module.exports = {
     'react-hooks/exhaustive-deps': 'warn',
     'react/prop-types': 0,
     'react/display-name': 0,
-
+    // MUI
+    'no-restricted-imports': [
+      'error',
+      {
+        'patterns': ['@mui/*/*/*']
+      }
+    ],
+    // Common
     'no-console': 1,
     'no-lonely-if': 1,
     // 'no-unused-vars': 1,
