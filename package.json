@@ -7,11 +7,12 @@
     "dev": "vite --host",
     "build": "tsc && vite build --base=./",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "postinstall": "husky install"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
-      "yarn lint --fix",
+      "yarn run lint",
       "git add ."
     ]
 },
