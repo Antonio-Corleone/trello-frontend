@@ -13,6 +13,7 @@ function App() {
   }
   return (
     <>
+      <div>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ex porro recusandae molestiae veniam nesciunt excepturi fugit voluptatum repellat, dolorum tempore consequatur rerum natus, velit dignissimos, a modi. Voluptatem, natus? Dolore?</div>
       <Button variant="contained">Hello world</Button>
       <br />
       <br />
