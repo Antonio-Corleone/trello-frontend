@@ -7,6 +7,7 @@ import {
   useColorScheme
 } from '@mui/material/styles'
 import { Button } from '@mui/material'
+import SelectMode from './ModeSelect'
 
 function ModeToggle() {
   const { mode, setMode } = useColorScheme()
@@ -36,6 +37,7 @@ function Copyright() {
 function App() {
   return (
     <>
+      <SelectMode />
       <ModeToggle />
       <Container maxWidth="sm">
         <Box sx={{ my: 4 }}>
