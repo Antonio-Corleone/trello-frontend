@@ -1,54 +1,50 @@
-import Typography from '@mui/material/Typography'
-import Link from '@mui/material/Link'
 import Container from '@mui/material/Container'
 import Box from '@mui/material/Box'
-
-import {
-  useColorScheme
-} from '@mui/material/styles'
-import { Button } from '@mui/material'
 import SelectMode from './ModeSelect'
-
-function ModeToggle() {
-  const { mode, setMode } = useColorScheme()
-  return (
-    <Button
-      onClick={() => {
-        setMode(mode === 'light' ? 'dark' : 'light')
-      }}
-    >
-      {mode === 'light' ? 'Turn dark' : 'Turn light'}
-    </Button>
-  )
-}
-
-function Copyright() {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}.
-    </Typography>
-  )
-}
+import { TrelloTheme } from './theme'
+import { Theme } from '@mui/material'
 
 function App() {
   return (
-    <>
-      <SelectMode />
-      <ModeToggle />
-      <Container maxWidth="sm">
-        <Box sx={{ my: 4 }}>
-          <Typography variant="h4" component="h1" gutterBottom>
-            Material UI Vite.js example in TypeScript
-          </Typography>
-          <Typography color='text.secondary'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor aliquam delectus ab magni nam nulla debitis sed aliquid recusandae repellendus necessitatibus doloribus, consequuntur molestias fuga ipsa incidunt doloremque molestiae dignissimos!</Typography>
-          <Copyright />
-        </Box>
-      </Container>
-    </>
+    <Container disableGutters maxWidth={false} sx={{ height: '100vh' }}>
+      <Box sx={{
+        width: '100%',
+        backgroundColor: 'primary.light',
+        display: 'flex',
+        alignItems: 'center',
+        height: (theme: Theme | TrelloTheme) => {
+          const custom = theme as TrelloTheme
+          return custom.trello.appBarHeight
+        }
+      }}>
+        <SelectMode />
+      </Box>
+      <Box sx={{
+        width: '100%',
+        backgroundColor: 'primary.dark',
+        display: 'flex',
+        alignItems: 'center',
+        height: (theme: Theme | TrelloTheme) => {
+          const custom = theme as TrelloTheme
+          return custom.trello.boardBarHeight
+        }
+      }}>
+        Board Bar
+      </Box>
+      <Box sx={{
+        width: '100%',
+        backgroundColor: 'primary.main',
+        display: 'flex',
+        alignItems: 'center',
+        height: (theme: Theme | TrelloTheme) => {
+          const custom = theme as TrelloTheme
+          return `calc( 100vh - ${custom.trello.appBarHeight} - ${custom.trello.boardBarHeight})`
+        }
+      }}>
+        Main content
+      </Box>
+
+    </Container>
   )
 }
 

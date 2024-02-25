@@ -8,7 +8,7 @@ import theme from './theme'
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <CssVarsProvider theme={theme}>
-      <CssBaseline />
+      <CssBaseline enableColorScheme />
       <App />
     </CssVarsProvider>
   </React.StrictMode>
