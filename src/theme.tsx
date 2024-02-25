@@ -1,17 +1,23 @@
 import { cyan, deepOrange, orange, teal } from '@mui/material/colors'
-import { experimental_extendTheme as extendTheme, CssVarsThemeOptions } from '@mui/material/styles'
-export interface TrelloTheme extends CssVarsThemeOptions {
-  trello: {
-    appBarHeight: string,
-    boardBarHeight: string
-  }
-}
+import { experimental_extendTheme as extendTheme } from '@mui/material/styles'
 
-const theme = extendTheme({
+const custom = {
   trello: {
     appBarHeight: '48px',
     boardBarHeight: '58px'
-  },
+  }
+} as const
+
+// Update for Typescript
+type CustomTheme = {
+  [Key in keyof typeof custom]: typeof custom[Key];
+};
+declare module '@mui/material' {
+  interface Theme extends CustomTheme {}
+}
+// Create theme
+const theme = extendTheme({
+  ...custom,
   colorSchemes: {
     light: {
       palette: {
@@ -27,6 +33,6 @@ const theme = extendTheme({
     }
   }
   // ...other properties
-} as TrelloTheme)
+})
 
 export default theme
