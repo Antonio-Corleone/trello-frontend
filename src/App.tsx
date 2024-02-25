@@ -1,8 +1,6 @@
 import Container from '@mui/material/Container'
 import Box from '@mui/material/Box'
 import SelectMode from './ModeSelect'
-import { TrelloTheme } from './theme'
-import { Theme } from '@mui/material'
 
 function App() {
   return (
@@ -12,10 +10,7 @@ function App() {
         backgroundColor: 'primary.light',
         display: 'flex',
         alignItems: 'center',
-        height: (theme: Theme | TrelloTheme) => {
-          const custom = theme as TrelloTheme
-          return custom.trello.appBarHeight
-        }
+        height: (theme) => theme.trello.appBarHeight
       }}>
         <SelectMode />
       </Box>
@@ -24,10 +19,7 @@ function App() {
         backgroundColor: 'primary.dark',
         display: 'flex',
         alignItems: 'center',
-        height: (theme: Theme | TrelloTheme) => {
-          const custom = theme as TrelloTheme
-          return custom.trello.boardBarHeight
-        }
+        height: (theme) => theme.trello.boardBarHeight
       }}>
         Board Bar
       </Box>
@@ -36,10 +28,7 @@ function App() {
         backgroundColor: 'primary.main',
         display: 'flex',
         alignItems: 'center',
-        height: (theme: Theme | TrelloTheme) => {
-          const custom = theme as TrelloTheme
-          return `calc( 100vh - ${custom.trello.appBarHeight} - ${custom.trello.boardBarHeight})`
-        }
+        height: (theme) => `calc( 100vh - ${theme.trello.appBarHeight} - ${theme.trello.boardBarHeight})`
       }}>
         Main content
       </Box>
