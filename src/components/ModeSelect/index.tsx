@@ -27,7 +27,6 @@ export default function SelectMode() {
         label="Mode"
         onChange={handleChange}
       >
-
         <MenuItem value='light'>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <LightModeIcon fontSize='small' />Light
