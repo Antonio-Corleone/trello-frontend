@@ -13,7 +13,7 @@ type CustomTheme = {
   [Key in keyof typeof custom]: typeof custom[Key];
 };
 declare module '@mui/material' {
-  interface Theme extends CustomTheme {}
+  interface Theme extends CustomTheme { }
 }
 // Create theme
 const theme = extendTheme({
@@ -29,6 +29,42 @@ const theme = extendTheme({
       palette: {
         primary: cyan,
         secondary: orange
+      }
+    }
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none'
+        }
+      }
+    },
+    MuiInputLabel: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          fontSize: '0.875rem',
+          color: theme.palette.primary.main
+        })
+      }
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          fontSize: '0.875rem',
+          color: theme.palette.primary.main,
+          '.MuiOutlinedInput-notchedOutline': {
+            borderColor: theme.palette.primary.light
+          },
+          '&:hover': {
+            '.MuiOutlinedInput-notchedOutline': {
+              borderColor: theme.palette.primary.main
+            }
+          },
+          '& fieldset': {
+            borderWidth: '1px !important'
+          }
+        })
       }
     }
   }
