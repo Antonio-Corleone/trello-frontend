@@ -16,19 +16,20 @@ import Recent from './Menu/Recent'
 import Started from './Menu/Started'
 import Templates from './Menu/Templates'
 import Profiles from './Menu/Profiles'
+import TrelloDrawer from './Menu/TrelloDrawer'
 
 function AppBar() {
   return (
     <Box px={2} sx={{
       width: '100%',
-      // backgroundColor: 'primary.light',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
       height: (theme) => theme.trello.appBarHeight
     }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        <AppsIcon sx={{ color: 'primary.light' }} />
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, md: 1 } }}>
+        <AppsIcon sx={{ color: 'primary.light', display: { xs: 'none', md: 'flex' } }} />
+        <TrelloDrawer />
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
           <SvgIcon
             component={TrelloIcon}
@@ -42,19 +43,22 @@ function AppBar() {
             sx={{
               color: 'primary.light',
               fontSize: '1.2rem',
-              fontWeight: 'bold'
+              fontWeight: 'bold',
+              display: { xs: 'none', lg: 'inline-block' }
             }}
           >Trello
           </Typography>
         </Box>
-        <Workspaces />
-        <Recent />
-        <Started />
-        <Templates />
-        <Button variant="outlined">Create</Button>
+        <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1, alignItems: 'center' }}>
+          <Workspaces />
+          <Recent />
+          <Started />
+          <Templates />
+          <Button variant="outlined">Create</Button>
+        </Box>
       </Box>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        <TextField id="outlined-search" label="Search field" type="search" size='small' />
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, lg: 2 } }}>
+        <TextField id="outlined-search" label="Search field" type="search" size='small' sx={{ width: { md: 120, lg: 190 } }} />
         <SelectMode />
         <Tooltip title="Notification">
           <Badge color="secondary" variant="dot" sx={{ cursor: 'pointer' }}>
