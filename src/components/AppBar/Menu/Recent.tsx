@@ -32,7 +32,8 @@ function Recent() {
         onClick={handleClick}
         endIcon={<ExpandMoreIcon />}
         sx={{
-          lineHeight: 'normal'
+          lineHeight: 'normal',
+          color: 'white'
         }}
       >
         Recent

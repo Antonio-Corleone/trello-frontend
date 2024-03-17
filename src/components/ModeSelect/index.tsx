@@ -43,14 +43,25 @@ export default function SelectMode() {
   }
   return (
     <FormControl size="small">
-      <InputLabel sx={{ display: { xs: 'flex', md: 'none', lg: 'flex' } }} id="select-dart-light-mode">Mode</InputLabel>
+      <InputLabel
+        sx={{ display: { xs: 'flex', md: 'none', lg: 'flex' }, color: 'white', '&.Mui-focused': { color: 'white' } }}
+        id="select-dart-light-mode"
+      >Mode
+      </InputLabel>
       <Select
         labelId="select-dart-light-mode"
         id="dart-light-mode"
         value={mode}
         label="Mode"
         onChange={handleChange}
-        sx={{ display: { xs: 'flex', md: 'none', lg: 'flex' } }}
+        sx={{
+          display: { xs: 'flex', md: 'none', lg: 'flex' },
+          color: 'white',
+          '.MuiOutlinedInput-notchedOutline': { borderColor: 'white' },
+          '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'white' },
+          '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: 'white' },
+          '.MuiSvgIcon-root': { color: 'white' }
+        }}
       >
         <MenuItem value='light'>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -110,6 +121,6 @@ export default function SelectMode() {
           handleClose()
         }}>System</MenuItem>
       </Menu>
-    </FormControl>
+    </FormControl >
   )
 }
