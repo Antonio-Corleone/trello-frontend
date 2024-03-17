@@ -8,6 +8,7 @@ import Badge from '@mui/material/Badge'
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone'
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
 import Tooltip from '@mui/material/Tooltip'
+import LibraryAddIcon from '@mui/icons-material/LibraryAdd'
 
 import SelectMode from '@components/ModeSelect/index'
 import { ReactComponent as TrelloIcon } from '@/assets/trello.svg'
@@ -54,7 +55,7 @@ function AppBar() {
           <Recent />
           <Started />
           <Templates />
-          <Button variant="outlined">Create</Button>
+          <Button startIcon={<LibraryAddIcon />} variant="outlined">Create</Button>
         </Box>
       </Box>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, lg: 2 } }}>
