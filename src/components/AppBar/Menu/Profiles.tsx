@@ -35,8 +35,8 @@ function Profiles() {
         >
           <Avatar alt="Antonio" src={AvatarIcon} sx={[
             {
-              width: 30,
-              height: 30,
+              width: 36,
+              height: 36,
               'img': {
                 objectFit: 'contain'
               }

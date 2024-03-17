@@ -32,7 +32,8 @@ function Templates() {
         onClick={handleClick}
         endIcon={<ExpandMoreIcon />}
         sx={{
-          lineHeight: 'normal'
+          lineHeight: 'normal',
+          color: 'white'
         }}
       >
         Templates
