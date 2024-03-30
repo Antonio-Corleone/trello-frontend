@@ -99,7 +99,11 @@ function BoardBar() {
             height: 34,
             fontSize: '1rem',
             cursor: 'pointer',
-            border: 'none'
+            border: 'none',
+            color: 'white',
+            '&:first-of-type': {
+              bgcolor: '#a4b0be'
+            }
           }
         }}>
           <Tooltip title="antoniovu">
