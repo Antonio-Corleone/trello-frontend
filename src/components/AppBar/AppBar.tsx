@@ -14,7 +14,7 @@ import InputAdornment from '@mui/material/InputAdornment'
 import SearchIcon from '@mui/icons-material/Search'
 import CloseIcon from '@mui/icons-material/Close'
 
-import SelectMode from '@components/ModeSelect/index'
+import SelectMode from '@/components/ModeSelect/ModeSelect'
 import { ReactComponent as TrelloIcon } from '@/assets/trello.svg'
 import Workspaces from './Menu/Workspaces'
 import Recent from './Menu/Recent'
