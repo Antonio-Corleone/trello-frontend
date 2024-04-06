@@ -10,6 +10,8 @@ import AvatarGroup from '@mui/material/AvatarGroup'
 import Tooltip from '@mui/material/Tooltip'
 import Button from '@mui/material/Button'
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
+import TrelloBoard from '@/interfaces/TrelloBoard'
+import { capitalizeFirstLetter } from '@/utils/commons'
 
 const BoardItemStyle = {
   color: 'white',
@@ -24,7 +26,11 @@ const BoardItemStyle = {
     bgcolor: 'primary.50'
   }
 }
-function BoardBar() {
+interface BoardBarTypes {
+  board: TrelloBoard
+}
+function BoardBar({ board }: BoardBarTypes) {
+
   return (
     <Box sx={{
       width: '100%',
@@ -45,13 +51,13 @@ function BoardBar() {
         <Chip
           sx={BoardItemStyle}
           icon={<DashboardIcon />}
-          label="Antonio MERN STACK board"
+          label={board?.title}
           clickable
         />
         <Chip
           sx={BoardItemStyle}
           icon={<VpnLockIcon />}
-          label="Public/Private Workspace"
+          label={capitalizeFirstLetter(board?.type)}
           clickable
         />
         <Chip

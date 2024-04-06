@@ -2,7 +2,12 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import NoteAddIcon from '@mui/icons-material/NoteAdd'
 import Column from './Column/Column'
-function ListColumns() {
+import { TrelloColumn } from '@/interfaces/TrelloBoard'
+
+interface ListColumnsTypes {
+  columns: TrelloColumn[]
+}
+function ListColumns({ columns }: ListColumnsTypes) {
   return (
     <Box sx={{
       bgcolor: 'inherit',
@@ -13,10 +18,8 @@ function ListColumns() {
       overflowY: 'hidden',
       '&::-webkit-scrollbar-track': { m: 2 }
     }}>
-      {/* Column 01 Sample */}
-      <Column />
-      <Column />
-      <Column />
+      {/* List Columns */}
+      {columns && columns?.map((column: TrelloColumn) => (<Column key={column?._id} column={column} />))}
       {/* Add new column */}
       <Box
         sx={{
