@@ -18,8 +18,13 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import AddCardIcon from '@mui/icons-material/AddCard'
 import DragHandleIcon from '@mui/icons-material/DragHandle'
 import ListCards from './ListCards/ListCards'
+import { TrelloCard, TrelloColumn } from '@/interfaces/TrelloBoard'
+import { mapOrderArray } from '@/utils/commons'
 
-function Column() {
+interface ColumnTypes {
+  column: TrelloColumn
+}
+function Column({ column }: ColumnTypes) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement | SVGSVGElement>(null)
   const open = Boolean(anchorEl)
   const handleClick = (event: React.MouseEvent<HTMLButtonElement | SVGSVGElement>) => {
@@ -28,6 +33,7 @@ function Column() {
   const handleClose = () => {
     setAnchorEl(null)
   }
+  const orderedCards = mapOrderArray(column?.cards, column?.cardOrderIds, '_id') as TrelloCard[]
   return (
     <Box sx={{
       minWidth: 300,
@@ -56,7 +62,7 @@ function Column() {
             fontSize: '1rem'
           }}
         >
-          Column Title
+          {column?.title}
         </Typography>
         <Box>
           <Tooltip title="More option">
@@ -111,7 +117,7 @@ function Column() {
         </Box>
       </Box>
       {/* Column body */}
-      <ListCards />
+      <ListCards cards={orderedCards} />
       {/* Column footer */}
       <Box
         sx={{

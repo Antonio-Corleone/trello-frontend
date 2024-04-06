@@ -1,7 +1,11 @@
 import Box from '@mui/material/Box'
 import Card from './Card/Card'
+import { TrelloCard } from '@/interfaces/TrelloBoard'
 
-function ListCards() {
+interface ListCardsTypes {
+  cards: TrelloCard[]
+}
+function ListCards({ cards }: ListCardsTypes) {
   return (
     <Box
       sx={{
@@ -26,11 +30,7 @@ function ListCards() {
         }
       }}
     >
-      <Card showCardMedia cardTitle='TRELLO MERN STACK' />
-      <Card cardTitle='Trello'/>
-      <Card cardTitle='Learn NodeJS'/>
-      <Card cardTitle='Review ReactJS'/>
-      <Card cardTitle='Practice algorithm & data structure'/>
+      {cards && cards?.map((card: TrelloCard) => (<Card key={card?._id} card={card} />))}
     </Box>
   )
 }
