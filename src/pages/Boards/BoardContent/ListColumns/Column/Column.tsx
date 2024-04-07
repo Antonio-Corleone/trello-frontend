@@ -7,7 +7,6 @@ import Typography from '@mui/material/Typography'
 import Tooltip from '@mui/material/Tooltip'
 import ListItemText from '@mui/material/ListItemText'
 import Button from '@mui/material/Button'
-
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ContentCut from '@mui/icons-material/ContentCut'
@@ -17,6 +16,10 @@ import Cloud from '@mui/icons-material/Cloud'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import AddCardIcon from '@mui/icons-material/AddCard'
 import DragHandleIcon from '@mui/icons-material/DragHandle'
+
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+
 import ListCards from './ListCards/ListCards'
 import { TrelloColumn } from '@/interfaces/TrelloBoard'
 import { mapOrderArray } from '@/utils/commons'
@@ -34,16 +37,33 @@ function Column({ column }: ColumnTypes) {
     setAnchorEl(null)
   }
   const orderedCards = mapOrderArray(column?.cards, column?.cardOrderIds, '_id')
+  // Implement DnD Kit
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+    id: column._id,
+    data: { ...column }
+  })
+
+  const dndKitColumnStyle = {
+    touchAction: 'none',
+    transform: CSS.Translate.toString(transform),
+    transition
+  }
+
   return (
-    <Box sx={{
-      minWidth: 300,
-      maxWidth: 300,
-      bgcolor: (theme) => theme.palette.mode === 'dark' ? '#333643' : '#ebecf0',
-      ml: 2,
-      borderRadius: '6px',
-      height: 'fit-content',
-      maxHeight: (theme) => `calc(${theme.trello.boardContentHeigh} - ${theme.spacing(5)})`
-    }}>
+    <Box
+      ref={setNodeRef}
+      style={dndKitColumnStyle}
+      {...attributes}
+      {...listeners}
+      sx={{
+        minWidth: 300,
+        maxWidth: 300,
+        bgcolor: (theme) => theme.palette.mode === 'dark' ? '#333643' : '#ebecf0',
+        ml: 2,
+        borderRadius: '6px',
+        height: 'fit-content',
+        maxHeight: (theme) => `calc(${theme.trello.boardContentHeigh} - ${theme.spacing(5)})`
+      }}>
       {/* Column header */}
       <Box
         sx={{

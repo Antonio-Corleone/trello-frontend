@@ -6,13 +6,13 @@ export const mockData = {
     type: 'public' as BoardTypes, // 'private'
     ownerIds: [], // users have Admin role of board
     memberIds: [], // users are normal member of board
-    columnOrderIds: ['column-id-02', 'column-id-01', 'column-id-03'], // sort order / position of Columns in boards
+    columnOrderIds: ['column-id-01', 'column-id-02', 'column-id-03'], // sort order / position of Columns in boards
     columns: [
       {
         _id: 'column-id-01',
         boardId: 'board-id-01',
         title: 'To Do Column 01',
-        cardOrderIds: ['card-id-07', 'card-id-02', 'card-id-03', 'card-id-04', 'card-id-05', 'card-id-06', 'card-id-01'],
+        cardOrderIds: ['card-id-01', 'card-id-02', 'card-id-03', 'card-id-04', 'card-id-05', 'card-id-06', 'card-id-07'],
         cards: [
           {
             _id: 'card-id-01',
@@ -48,7 +48,7 @@ export const mockData = {
         _id: 'column-id-03',
         boardId: 'board-id-01',
         title: 'Done Column 03',
-        cardOrderIds: ['card-id-13', 'card-id-11', 'card-id-12'],
+        cardOrderIds: ['card-id-11', 'card-id-12', 'card-id-13'],
         cards: [
           { _id: 'card-id-11', boardId: 'board-id-01', columnId: 'column-id-03', title: 'Title of card 11', description: null, cover: null, memberIds: [], comments: [], attachments: [] },
           { _id: 'card-id-12', boardId: 'board-id-01', columnId: 'column-id-03', title: 'Title of card 12', description: 'Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging across all continents except Antarctica', cover: null, memberIds: ['test-user-id-01'], comments: ['test comment 01', 'test comment 02'], attachments: ['test attachment 01', 'test attachment 02', 'test attachment 03'] },
