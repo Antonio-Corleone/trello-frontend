@@ -1,5 +1,3 @@
-import { TrelloColumn, TrelloCard } from '@/interfaces/TrelloBoard'
-
 export const capitalizeFirstLetter = (value:string) => {
   if (!value) {
     return ''
@@ -7,8 +5,11 @@ export const capitalizeFirstLetter = (value:string) => {
   return `${value.charAt(0).toUpperCase()}${value.slice(1)}`
 }
 
-type KeyType = TrelloColumn | TrelloCard
-export const mapOrderArray = <K extends keyof KeyType>(originalArray:TrelloColumn[] | TrelloCard[], orderArray:string[], key: K) => {
+interface MapOrderArrayType {
+  <T, U>(originalArray:T[], orderArray:U[], key: keyof T):T[];
+}
+
+export const mapOrderArray:MapOrderArrayType = (originalArray, orderArray, key) => {
   if (!originalArray||!orderArray||!key) return []
-  return [...originalArray].sort((a, b) => orderArray.indexOf(a[key]) - orderArray.indexOf(b[key]))
+  return [...originalArray].sort((a, b) => orderArray.indexOf(a[key] as typeof orderArray[0] ) - orderArray.indexOf(b[key] as typeof orderArray[0]))
 }
