@@ -1,13 +1,13 @@
 import Box from '@mui/material/Box'
 import ListColumns from './ListColumns/ListColumns'
-import TrelloBoard, { TrelloColumn } from '@/interfaces/TrelloBoard'
+import TrelloBoard from '@/interfaces/TrelloBoard'
 import { mapOrderArray } from '@/utils/commons'
 
 interface BoardContentTypes {
   board: TrelloBoard
 }
 function BoardContent({ board }: BoardContentTypes) {
-  const orderedColumns = mapOrderArray(board?.columns, board?.columnOrderIds, '_id') as TrelloColumn[]
+  const orderedColumns = mapOrderArray(board?.columns, board?.columnOrderIds, '_id')
   return (
     <Box sx={{
       width: '100%',

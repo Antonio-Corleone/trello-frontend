@@ -18,7 +18,7 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import AddCardIcon from '@mui/icons-material/AddCard'
 import DragHandleIcon from '@mui/icons-material/DragHandle'
 import ListCards from './ListCards/ListCards'
-import { TrelloCard, TrelloColumn } from '@/interfaces/TrelloBoard'
+import { TrelloColumn } from '@/interfaces/TrelloBoard'
 import { mapOrderArray } from '@/utils/commons'
 
 interface ColumnTypes {
@@ -33,7 +33,7 @@ function Column({ column }: ColumnTypes) {
   const handleClose = () => {
     setAnchorEl(null)
   }
-  const orderedCards = mapOrderArray(column?.cards, column?.cardOrderIds, '_id') as TrelloCard[]
+  const orderedCards = mapOrderArray(column?.cards, column?.cardOrderIds, '_id')
   return (
     <Box sx={{
       minWidth: 300,
