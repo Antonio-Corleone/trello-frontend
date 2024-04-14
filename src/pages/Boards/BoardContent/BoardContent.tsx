@@ -5,14 +5,15 @@ import {
   DragEndEvent,
   useSensor,
   useSensors,
-  // PointerSensor,
   MouseSensor,
   TouchSensor,
   UniqueIdentifier,
   DragOverlay,
   DropAnimation,
   defaultDropAnimationSideEffects,
-  closestCorners
+  closestCorners,
+  Over,
+  Active
 } from '@dnd-kit/core'
 import { arrayMove } from '@dnd-kit/sortable'
 import { cloneDeep } from 'lodash'
@@ -38,16 +39,12 @@ function BoardContent({ board }: BoardContentTypes) {
   const [activeDragItemId, setActiveDragItemId] = useState<UniqueIdentifier | null>(null)
   const [activeDragItemType, setActiveDragItemType] = useState<string | null>(null)
   const [activeDragItemData, setActiveDragItemData] = useState<TrelloColumn | TrelloCard | null>(null)
+  const [originalColumn, setOriginalColumn] = useState<TrelloColumn | null>(null)
 
   useEffect(() => {
     setOrderedColumns(mapOrderArray(board?.columns, board?.columnOrderIds, '_id'))
   }, [board])
 
-  // const pointerSensor = useSensor(
-  //   PointerSensor,
-  //   // Require the mouse to move by 10 pixels before activating
-  //   { activationConstraint: { distance: 10 } }
-  // )
   const mouseSensor = useSensor(
     MouseSensor,
     // Require the mouse to move by 10 pixels before activating
@@ -64,12 +61,59 @@ function BoardContent({ board }: BoardContentTypes) {
     }
   )
   const mySensors = useSensors(
-    // pointerSensor,
     mouseSensor,
     touchSensor
   )
   const findColumnByCardId = (cardId: UniqueIdentifier) => {
-    return orderedColumns.find(col => col.cards?.map(card => card._id)?.includes(cardId as string))
+    return orderedColumns.find(col => col.cards?.map(card => card._id)?.includes(cardId as string)) ?? null
+  }
+  interface MoveCardBetweenColumn {
+    overColumn: TrelloColumn;
+    overCardId: UniqueIdentifier;
+    over: Over | null;
+    active: Active;
+    activeColumn: TrelloColumn;
+    activeDraggingCardId: UniqueIdentifier;
+  }
+  const handleMoveCardBetweenColumns = ({
+    overColumn,
+    overCardId,
+    over,
+    active,
+    activeColumn,
+    activeDraggingCardId
+  }: MoveCardBetweenColumn) => {
+    const { data: { current: activeDraggingCardData } } = active
+    setOrderedColumns(prevColumns => {
+      const overCardIndex = overColumn?.cards?.findIndex((card: TrelloCard) => card._id === overCardId)
+      let newCardIndex: number = -1
+      const isBelowOverItem = over && active.rect.current.translated && active.rect.current.translated.top > over.rect.top + over.rect.height
+
+      const modifier = isBelowOverItem ? 1 : 0
+
+      newCardIndex = overCardIndex >= 0 ? overCardIndex + modifier : overColumn?.cards?.length + 1
+
+      const nextColumns = cloneDeep(prevColumns)
+      const nextActiveColumn = nextColumns.find(column => column._id === activeColumn._id)
+      const nextOverColumn = nextColumns.find(column => column._id === overColumn._id)
+
+      // remove active card id from active column
+      nextActiveColumn!.cards = nextActiveColumn!.cards.filter(card => card._id !== activeDraggingCardId)
+      //  update cardOrderIds for active column
+      nextActiveColumn!.cardOrderIds = nextActiveColumn!.cards.map(card => card._id)
+
+      // check if active card id has existed in over column yet, if it has existed remove
+      nextOverColumn!.cards = nextOverColumn!.cards.filter(card => card._id !== activeDraggingCardId)
+      // update active card to the new index of over column
+      nextOverColumn!.cards.splice(newCardIndex, 0, {
+        ...activeDraggingCardData,
+        columnId: overColumn._id
+      } as TrelloCard)
+      // update cardOrderIds for active column
+      nextOverColumn!.cardOrderIds = nextOverColumn!.cards.map(card => card._id)
+
+      return nextColumns
+    })
   }
   const handleDragStart = (event: DragEndEvent) => {
     let itemData = null
@@ -77,6 +121,7 @@ function BoardContent({ board }: BoardContentTypes) {
     const itemType = event?.active?.data?.current?.columnId ? ACTIVE_DRAG_ITEM_TYPE['card'] : ACTIVE_DRAG_ITEM_TYPE['column']
     if (itemType === 'ACTIVE_DRAG_ITEM_TYPE_CARD') {
       itemData = event?.active?.data?.current as TrelloCard
+      setOriginalColumn(findColumnByCardId(itemId))
     } else {
       itemData = event?.active?.data?.current as TrelloColumn
     }
@@ -90,80 +135,77 @@ function BoardContent({ board }: BoardContentTypes) {
     if (activeDragItemType === ACTIVE_DRAG_ITEM_TYPE['column']) return
     const { active, over } = event
     if (!active || !over) return
-    const {
-      id: activeDraggingCardId,
-      data: { current: activeDraggingCardData }
-    } = active
-    const { id: overCardId, data: { current: overColumnData } } = over
-
+    const { id: activeDraggingCardId } = active
+    const { id: overCardId } = over
     const activeColumn = findColumnByCardId(activeDraggingCardId)
-    // if overColumn has an empty cards findColumnByCardId(overCardId) will return undefined
-    // In this case overColumn is overColumnData
-    const overColumn = findColumnByCardId(overCardId) ?? overColumnData
+    const overColumn = findColumnByCardId(overCardId)
     if (!activeColumn || !overColumn) return
     if (activeColumn._id !== overColumn._id) {
-      setOrderedColumns(prevColumns => {
-        const overCardIndex = overColumn?.cards?.findIndex((card: TrelloCard) => card._id === overCardId)
-        let newCardIndex: number = -1
-        const isBelowOverItem = over && active.rect.current.translated && active.rect.current.translated.top > over.rect.top + over.rect.height
-
-        const modifier = isBelowOverItem ? 1 : 0
-
-        newCardIndex = overCardIndex >= 0 ? overCardIndex + modifier : overColumn?.cards?.length + 1
-
-        const nextColumns = cloneDeep(prevColumns)
-        const nextActiveColumn = nextColumns.find(column => column._id === activeColumn._id)
-        const nextOverColumn = nextColumns.find(column => column._id === overColumn._id)
-        if (nextActiveColumn) {
-          // remove active card id from active column
-          nextActiveColumn.cards = nextActiveColumn.cards.filter(card => card._id !== activeDraggingCardId)
-          //  update cardOrderIds for active column
-          nextActiveColumn.cardOrderIds = nextActiveColumn.cards.map(card => card._id)
-        }
-        if (nextOverColumn) {
-          // check if active card id has existed in over column yet, if it has existed remove
-          nextOverColumn.cards = nextOverColumn.cards.filter(card => card._id !== activeDraggingCardId)
-          // update active card to the new index of over column
-          nextOverColumn.cards.splice(newCardIndex, 0, activeDraggingCardData as TrelloCard)
-          // update cardOrderIds for active column
-          nextOverColumn.cardOrderIds = nextOverColumn.cards.map(card => card._id)
-        }
-        return nextColumns
+      handleMoveCardBetweenColumns({
+        active,
+        activeColumn,
+        activeDraggingCardId,
+        over,
+        overColumn,
+        overCardId
       })
-    } else {
-      const oldCardIndex = activeColumn.cardOrderIds.findIndex(c => c === activeDraggingCardId)
-      const newCardIndex = activeColumn.cardOrderIds.findIndex(c => c === overCardId)
-      const newOrderedCardIds = arrayMove(activeColumn.cardOrderIds, oldCardIndex, newCardIndex)
-      const updateColumnActive = {
-        ...activeColumn,
-        cardOrderIds: newOrderedCardIds
-      }
-      const newOrderedColumns = orderedColumns.map(col => {
-        if (col._id === updateColumnActive._id) {
-          return updateColumnActive
-        } else {
-          return col
-        }
-      })
-      setOrderedColumns(newOrderedColumns)
     }
   }
 
   const handleDragEnd = (event: DragEndEvent) => {
-    // If drag item is card do nothing
-    if (activeDragItemType === ACTIVE_DRAG_ITEM_TYPE['card']) return
     const { active, over } = event
     if (!active || !over) return
-    if (active.id !== over.id) {
-      const oldIndex = orderedColumns.findIndex(c => c._id === active.id)
-      const newIndex = orderedColumns.findIndex(c => c._id === over.id)
-      const newOrderedColumns = arrayMove(orderedColumns, oldIndex, newIndex)
-      setOrderedColumns(newOrderedColumns)
+    // DnD Card
+    if (activeDragItemType === ACTIVE_DRAG_ITEM_TYPE['card']) {
+      const { id: activeDraggingCardId } = active
+      const { id: overCardId } = over
+      const activeColumn = findColumnByCardId(activeDraggingCardId)
+      const overColumn = findColumnByCardId(overCardId)
+      if (!activeColumn || !overColumn) return
+      if (originalColumn?._id !== overColumn._id) {
+        // DnD card between different columns
+        handleMoveCardBetweenColumns({
+          active,
+          activeColumn,
+          activeDraggingCardId,
+          over,
+          overColumn,
+          overCardId
+        })
+      }
+      else {
+        // Dnd card inside column
+        const oldCardIndex = activeColumn.cards.findIndex(c => c._id === activeDraggingCardId)
+        const newCardIndex = activeColumn.cards.findIndex(c => c._id === overCardId)
+        const newOrderedCards = arrayMove(activeColumn.cards, oldCardIndex, newCardIndex)
+        setOrderedColumns(prevColumns => {
+          const nextColumns = cloneDeep(prevColumns)
+          const targetedColumn = nextColumns.find(column => column._id === overColumn._id) as TrelloColumn
+          // update cards
+          targetedColumn.cards = newOrderedCards
+          // update cardOrderIds
+          targetedColumn.cardOrderIds = newOrderedCards.map(card => card._id)
+          return nextColumns
+        })
+      }
+    }
+    // DnD Column
+    if (activeDragItemType === ACTIVE_DRAG_ITEM_TYPE['column']) {
+      if (active.id !== over.id) {
+        const oldIndex = orderedColumns.findIndex(c => c._id === active.id)
+        const newIndex = orderedColumns.findIndex(c => c._id === over.id)
+        const newOrderedColumns = arrayMove(orderedColumns, oldIndex, newIndex)
+        // Update columns and columnOrderIds for board save to BE
+        // console.log('board', board)
+        // console.log('newOrderedColumns', newOrderedColumns)
+        setOrderedColumns(newOrderedColumns)
+      }
     }
     // Reset state after end drag item
     setActiveDragItemId(null)
     setActiveDragItemType(null)
     setActiveDragItemData(null)
+    setOriginalColumn(null)
   }
   const dropAnimation: DropAnimation = {
     sideEffects: defaultDropAnimationSideEffects({
