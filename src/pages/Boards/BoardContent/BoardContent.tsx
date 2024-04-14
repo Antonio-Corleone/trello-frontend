@@ -11,9 +11,12 @@ import {
   UniqueIdentifier,
   DragOverlay,
   DropAnimation,
-  defaultDropAnimationSideEffects
+  defaultDropAnimationSideEffects,
+  closestCorners
 } from '@dnd-kit/core'
 import { arrayMove } from '@dnd-kit/sortable'
+import { cloneDeep } from 'lodash'
+
 import TrelloBoard, { TrelloCard, TrelloColumn } from '@/interfaces/TrelloBoard'
 import { mapOrderArray } from '@/utils/commons'
 
@@ -65,6 +68,9 @@ function BoardContent({ board }: BoardContentTypes) {
     mouseSensor,
     touchSensor
   )
+  const findColumnByCardId = (cardId: UniqueIdentifier) => {
+    return orderedColumns.find(col => col.cards?.map(card => card._id)?.includes(cardId as string))
+  }
   const handleDragStart = (event: DragEndEvent) => {
     let itemData = null
     const itemId = event?.active?.id
@@ -79,9 +85,75 @@ function BoardContent({ board }: BoardContentTypes) {
     setActiveDragItemData(itemData)
   }
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragOver = (event: DragEndEvent) => {
+    // If drag item is column do nothing
+    if (activeDragItemType === ACTIVE_DRAG_ITEM_TYPE['column']) return
     const { active, over } = event
-    if (!over) return
+    if (!active || !over) return
+    const {
+      id: activeDraggingCardId,
+      data: { current: activeDraggingCardData }
+    } = active
+    const { id: overCardId, data: { current: overColumnData } } = over
+
+    const activeColumn = findColumnByCardId(activeDraggingCardId)
+    // if overColumn has an empty cards findColumnByCardId(overCardId) will return undefined
+    // In this case overColumn is overColumnData
+    const overColumn = findColumnByCardId(overCardId) ?? overColumnData
+    if (!activeColumn || !overColumn) return
+    if (activeColumn._id !== overColumn._id) {
+      setOrderedColumns(prevColumns => {
+        const overCardIndex = overColumn?.cards?.findIndex((card: TrelloCard) => card._id === overCardId)
+        let newCardIndex: number = -1
+        const isBelowOverItem = over && active.rect.current.translated && active.rect.current.translated.top > over.rect.top + over.rect.height
+
+        const modifier = isBelowOverItem ? 1 : 0
+
+        newCardIndex = overCardIndex >= 0 ? overCardIndex + modifier : overColumn?.cards?.length + 1
+
+        const nextColumns = cloneDeep(prevColumns)
+        const nextActiveColumn = nextColumns.find(column => column._id === activeColumn._id)
+        const nextOverColumn = nextColumns.find(column => column._id === overColumn._id)
+        if (nextActiveColumn) {
+          // remove active card id from active column
+          nextActiveColumn.cards = nextActiveColumn.cards.filter(card => card._id !== activeDraggingCardId)
+          //  update cardOrderIds for active column
+          nextActiveColumn.cardOrderIds = nextActiveColumn.cards.map(card => card._id)
+        }
+        if (nextOverColumn) {
+          // check if active card id has existed in over column yet, if it has existed remove
+          nextOverColumn.cards = nextOverColumn.cards.filter(card => card._id !== activeDraggingCardId)
+          // update active card to the new index of over column
+          nextOverColumn.cards.splice(newCardIndex, 0, activeDraggingCardData as TrelloCard)
+          // update cardOrderIds for active column
+          nextOverColumn.cardOrderIds = nextOverColumn.cards.map(card => card._id)
+        }
+        return nextColumns
+      })
+    } else {
+      const oldCardIndex = activeColumn.cardOrderIds.findIndex(c => c === activeDraggingCardId)
+      const newCardIndex = activeColumn.cardOrderIds.findIndex(c => c === overCardId)
+      const newOrderedCardIds = arrayMove(activeColumn.cardOrderIds, oldCardIndex, newCardIndex)
+      const updateColumnActive = {
+        ...activeColumn,
+        cardOrderIds: newOrderedCardIds
+      }
+      const newOrderedColumns = orderedColumns.map(col => {
+        if (col._id === updateColumnActive._id) {
+          return updateColumnActive
+        } else {
+          return col
+        }
+      })
+      setOrderedColumns(newOrderedColumns)
+    }
+  }
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    // If drag item is card do nothing
+    if (activeDragItemType === ACTIVE_DRAG_ITEM_TYPE['card']) return
+    const { active, over } = event
+    if (!active || !over) return
     if (active.id !== over.id) {
       const oldIndex = orderedColumns.findIndex(c => c._id === active.id)
       const newIndex = orderedColumns.findIndex(c => c._id === over.id)
@@ -103,7 +175,13 @@ function BoardContent({ board }: BoardContentTypes) {
     })
   }
   return (
-    <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd} sensors={mySensors}>
+    <DndContext
+      onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
+      onDragEnd={handleDragEnd}
+      sensors={mySensors}
+      collisionDetection={closestCorners}
+    >
       <Box sx={{
         width: '100%',
         display: 'flex',
