@@ -101,9 +101,8 @@ function BoardContent({ board }: BoardContentTypes) {
 
       newCardIndex = overCardIndex >= 0 ? overCardIndex + modifier : overColumn?.cards?.length + 1
 
-      const nextColumns = cloneDeep(prevColumns)
-      const nextActiveColumn = nextColumns.find(column => column._id === activeColumn._id)
-      const nextOverColumn = nextColumns.find(column => column._id === overColumn._id)
+      const nextActiveColumn = prevColumns.find(column => column._id === activeColumn._id)
+      const nextOverColumn = prevColumns.find(column => column._id === overColumn._id)
       if (nextActiveColumn) {
         // remove active card id from active column
         nextActiveColumn.cards = nextActiveColumn.cards.filter(card => card._id !== activeDraggingCardId)
@@ -127,7 +126,7 @@ function BoardContent({ board }: BoardContentTypes) {
       // update cardOrderIds for active column
       nextOverColumn!.cardOrderIds = nextOverColumn!.cards.map(card => card._id)
 
-      return nextColumns
+      return prevColumns
     })
   }
   const handleDragStart = (event: DragEndEvent) => {
