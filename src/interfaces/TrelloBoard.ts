@@ -7,7 +7,8 @@ export interface TrelloCard {
   cover:string|null;
   memberIds: string[];
   comments: string[];
-  attachments: string[]
+  attachments: string[];
+  FE_PlaceholderCard?: boolean
 }
 
 export interface TrelloColumn {
