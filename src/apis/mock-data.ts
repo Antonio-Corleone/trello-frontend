@@ -6,7 +6,7 @@ export const mockData = {
     type: 'public' as BoardTypes, // 'private'
     ownerIds: [], // users have Admin role of board
     memberIds: [], // users are normal member of board
-    columnOrderIds: ['column-id-01', 'column-id-02', 'column-id-03'], // sort order / position of Columns in boards
+    columnOrderIds: ['column-id-01', 'column-id-02', 'column-id-03', 'column-id-04'], // sort order / position of Columns in boards
     columns: [
       {
         _id: 'column-id-01',
@@ -53,6 +53,15 @@ export const mockData = {
           { _id: 'card-id-11', boardId: 'board-id-01', columnId: 'column-id-03', title: 'Title of card 11', description: null, cover: null, memberIds: [], comments: [], attachments: [] },
           { _id: 'card-id-12', boardId: 'board-id-01', columnId: 'column-id-03', title: 'Title of card 12', description: 'Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging across all continents except Antarctica', cover: null, memberIds: ['test-user-id-01'], comments: ['test comment 01', 'test comment 02'], attachments: ['test attachment 01', 'test attachment 02', 'test attachment 03'] },
           { _id: 'card-id-13', boardId: 'board-id-01', columnId: 'column-id-03', title: 'Title of card 13', description: null, cover: null, memberIds: [], comments: [], attachments: [] }
+        ]
+      },
+      {
+        _id: 'column-id-04',
+        boardId: 'board-id-01',
+        title: 'Empty Column 04',
+        cardOrderIds: ['column-id-04_placeholder_Card'],
+        cards: [
+          { _id: 'column-id-04_placeholder_Card', boardId: 'board-id-01', columnId: 'column-id-04', FE_PlaceholderCard: true }
         ]
       }
     ]

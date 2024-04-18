@@ -19,10 +19,10 @@ import {
   getFirstCollision
 } from '@dnd-kit/core'
 import { arrayMove } from '@dnd-kit/sortable'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, isEmpty } from 'lodash'
 
 import TrelloBoard, { TrelloCard, TrelloColumn } from '@/interfaces/TrelloBoard'
-import { mapOrderArray } from '@/utils/commons'
+import { generatePlaceHolderCard, mapOrderArray } from '@/utils/commons'
 
 import ListColumns from './ListColumns/ListColumns'
 import Column from './ListColumns/Column/Column'
@@ -31,6 +31,16 @@ import Card from './ListColumns/Column/ListCards/Card/Card'
 interface BoardContentTypes {
   board: TrelloBoard
 }
+
+interface MoveCardBetweenColumn {
+  overColumn: TrelloColumn;
+  overCardId: UniqueIdentifier;
+  over: Over | null;
+  active: Active;
+  activeColumn: TrelloColumn;
+  activeDraggingCardId: UniqueIdentifier;
+}
+
 enum ACTIVE_DRAG_ITEM_TYPE {
   'card' = 'ACTIVE_DRAG_ITEM_TYPE_CARD',
   'column' = 'ACTIVE_DRAG_ITEM_TYPE_COLUMN'
@@ -72,14 +82,7 @@ function BoardContent({ board }: BoardContentTypes) {
   const findColumnByCardId = (cardId: UniqueIdentifier) => {
     return orderedColumns.find(col => col.cards?.map(card => card._id)?.includes(cardId as string)) ?? null
   }
-  interface MoveCardBetweenColumn {
-    overColumn: TrelloColumn;
-    overCardId: UniqueIdentifier;
-    over: Over | null;
-    active: Active;
-    activeColumn: TrelloColumn;
-    activeDraggingCardId: UniqueIdentifier;
-  }
+
   const handleMoveCardBetweenColumns = ({
     overColumn,
     overCardId,
@@ -101,11 +104,16 @@ function BoardContent({ board }: BoardContentTypes) {
       const nextColumns = cloneDeep(prevColumns)
       const nextActiveColumn = nextColumns.find(column => column._id === activeColumn._id)
       const nextOverColumn = nextColumns.find(column => column._id === overColumn._id)
-
-      // remove active card id from active column
-      nextActiveColumn!.cards = nextActiveColumn!.cards.filter(card => card._id !== activeDraggingCardId)
-      //  update cardOrderIds for active column
-      nextActiveColumn!.cardOrderIds = nextActiveColumn!.cards.map(card => card._id)
+      if (nextActiveColumn) {
+        // remove active card id from active column
+        nextActiveColumn.cards = nextActiveColumn.cards.filter(card => card._id !== activeDraggingCardId)
+        // Check if nextActiveColumn.cards = [], add FE_PlaceholderCard
+        if (isEmpty(nextActiveColumn?.cards)) {
+          generatePlaceHolderCard(nextActiveColumn)
+        }
+        //  update cardOrderIds for active column
+        nextActiveColumn.cardOrderIds = nextActiveColumn.cards.map(card => card._id)
+      }
 
       // check if active card id has existed in over column yet, if it has existed remove
       nextOverColumn!.cards = nextOverColumn!.cards.filter(card => card._id !== activeDraggingCardId)
@@ -114,6 +122,8 @@ function BoardContent({ board }: BoardContentTypes) {
         ...activeDraggingCardData,
         columnId: overColumn._id
       } as TrelloCard)
+      // remove placeholderCard from nextOverColumn
+      nextOverColumn!.cards = nextOverColumn!.cards.filter(card => card._id !== nextOverColumn?._id + '_' + 'placeholderCard')
       // update cardOrderIds for active column
       nextOverColumn!.cardOrderIds = nextOverColumn!.cards.map(card => card._id)
 
